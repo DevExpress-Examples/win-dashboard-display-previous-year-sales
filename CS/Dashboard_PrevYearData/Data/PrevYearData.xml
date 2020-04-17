@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Dashboard CurrencyCulture="en-US">
+  <Title Text="Dashboard" />
+  <DataSources>
+    <SqlDataSource Name="SQL Data Source 1" ComponentName="dashboardSqlDataSource1" DataProcessingMode="Client">
+      <Connection Name="nwind" ProviderKey="InMemorySetFull">
+        <Parameters>
+          <Parameter Name="database" Value="..\..\Data\nwind.xml" />
+          <Parameter Name="read only" Value="1" />
+          <Parameter Name="generateConnectionHelper" Value="false" />
+        </Parameters>
+      </Connection>
+      <Query Type="SelectQuery" Name="Orders">
+        <Tables>
+          <Table Name="Orders" />
+          <Table Name="[Order Details]" />
+          <Table Name="Products" />
+          <Relation Type="Inner" Parent="Orders" Nested="[Order Details]">
+            <KeyColumn Parent="OrderID" Nested="OrderID" />
+          </Relation>
+          <Relation Type="Inner" Parent="[Order Details]" Nested="Products">
+            <KeyColumn Parent="ProductID" Nested="ProductID" />
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="Orders" Name="OrderDate" />
+          <Column Table="[Order Details]" Name="UnitPrice" />
+          <Column Table="[Order Details]" Name="Quantity" />
+          <Column Table="Products" Name="ProductName" />
+        </Columns>
+      </Query>
+      <ResultSchema>
+        <DataSet Name="SQL Data Source 1">
+          <View Name="Orders">
+            <Field Name="OrderDate" Type="DateTime" />
+            <Field Name="UnitPrice" Type="Decimal" />
+            <Field Name="Quantity" Type="Int16" />
+            <Field Name="ProductName" Type="String" />
+          </View>
+        </DataSet>
+      </ResultSchema>
+      <ConnectionOptions CloseConnection="true" DbCommandTimeout="300" />
+      <CalculatedFields>
+        <CalculatedField Name="Sales" Expression="[UnitPrice] * [Quantity]" DataType="Object" DataMember="Orders" />
+        <CalculatedField Name="PrevYearSales" Expression="aggr(Sum([Sales]),joinRule(GetYear([OrderDate]),GetYear([OrderDate])-1))" DataType="Auto" DataMember="Orders" />
+        <CalculatedField Name="PrevQuarterYearSales" Expression="aggr(Sum([Sales]),[ProductName],joinRule(GetDateQuarterYear([OrderDate]),GetDateQuarterYear(AddYears([OrderDate], -1))))" DataType="Auto" DataMember="Orders" />
+      </CalculatedFields>
+    </SqlDataSource>
+  </DataSources>
+  <Items>
+    <Grid ComponentName="gridDashboardItem1" Name="Previous Year Sales" DataSource="dashboardSqlDataSource1" DataMember="Orders">
+      <DataItems>
+        <Dimension DataMember="OrderDate" DefaultId="DataItem0" />
+        <Measure DataMember="Sales" DefaultId="DataItem1" />
+        <Measure DataMember="PrevYearSales" SummaryType="Max" DefaultId="DataItem2" />
+      </DataItems>
+      <GridColumns>
+        <GridDimensionColumn>
+          <Dimension DefaultId="DataItem0" />
+        </GridDimensionColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem1" />
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem2" />
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions AllowGridCellMerge="true" />
+    </Grid>
+    <Grid ComponentName="gridDashboardItem2" Name="Product Sales by Quarters" DataSource="dashboardSqlDataSource1" DataMember="Orders">
+      <DataItems>
+        <Measure DataMember="Sales" DefaultId="DataItem1" />
+        <Dimension DataMember="ProductName" DefaultId="DataItem2" />
+        <Dimension DataMember="OrderDate" DateTimeGroupInterval="QuarterYear" DefaultId="DataItem0" />
+        <Measure DataMember="PrevQuarterYearSales" SummaryType="Max" DefaultId="DataItem3" />
+      </DataItems>
+      <FormatRules>
+        <GridItemFormatRule Name="FormatRule 1" DataItem="DataItem3" DataItemApplyTo="DataItem1">
+          <FormatConditionExpression Expression="[DataItem1] &lt; [DataItem3]">
+            <AppearanceSettings AppearanceType="PaleRed" />
+          </FormatConditionExpression>
+        </GridItemFormatRule>
+      </FormatRules>
+      <GridColumns>
+        <GridDimensionColumn>
+          <Dimension DefaultId="DataItem2" />
+        </GridDimensionColumn>
+        <GridDimensionColumn>
+          <Dimension DefaultId="DataItem0" />
+        </GridDimensionColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem1" />
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem3" />
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions AllowGridCellMerge="true" />
+    </Grid>
+  </Items>
+  <LayoutTree>
+    <LayoutGroup Weight="100">
+      <LayoutItem DashboardItem="gridDashboardItem1" Weight="49.948822927328557" />
+      <LayoutItem DashboardItem="gridDashboardItem2" Weight="50.051177072671443" />
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>
