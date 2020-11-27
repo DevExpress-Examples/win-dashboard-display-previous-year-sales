@@ -100,8 +100,8 @@
   </Items>
   <LayoutTree>
     <LayoutGroup Weight="100">
-      <LayoutItem DashboardItem="gridDashboardItem1" Weight="49.948822927328557" />
-      <LayoutItem DashboardItem="gridDashboardItem2" Weight="50.051177072671443" />
+      <LayoutItem DashboardItem="gridDashboardItem1" Weight="43.627450980392155" />
+      <LayoutItem DashboardItem="gridDashboardItem2" Weight="56.372549019607845" />
     </LayoutGroup>
   </LayoutTree>
 </Dashboard>
